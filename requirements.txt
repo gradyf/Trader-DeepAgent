@@ -1,4 +1,6 @@
 tavily-python
 deepagents
 langchain-openrouter
+langsmith
 tavily-python
+anthropic

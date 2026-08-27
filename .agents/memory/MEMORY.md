@@ -1,0 +1,1 @@
+- [LangSmith prompt compatibility](langsmith-prompt-compatibility.md) — pulled chat prompts may need their system-message text extracted before use as an agent system prompt.

@@ -1,27 +1,46 @@
+import anthropic
 import os
 from pathlib import Path
 from typing import Literal
 from tavily import TavilyClient
 from deepagents import create_deep_agent
+from langsmith import Client
 
-or_api = os.getenv("OPENROUTER_API_KEY")
+
+open_router_api = os.getenv("OPENROUTER_API_KEY")
 tavily_client = TavilyClient(api_key=os.environ["TAVILY_API_KEY"])
+anthropic_api = os.getenv("ANTHROPIC_API_KEY")
 
+# Prompts
 
-def get_weather(city: str) -> str:
-    """Get weather for a given city. Only return the weather, nothing else."""
-    return f"It's always sunny in {city}!"
-
-
-# System prompt to steer the agent to be an expert researcher
-orchestrator_prompt = Path("prompts/orchestrator.md").read_text(encoding="utf-8")
-
+client = Client()
+pulled_prompt = client.pull_prompt("orchestrator:b4f99065")
+orchestrator_prompt = "\n\n".join(
+    message.prompt.template
+    for message in pulled_prompt.messages
+    if message.__class__.__name__ == "SystemMessagePromptTemplate"
+)
 print(orchestrator_prompt)
+
+
+def internet_search(
+    query: str,
+    max_results: int = 5,
+    topic: Literal["general", "news", "finance"] = "general",
+    include_raw_content: bool = False,
+):
+    """Run a web search"""
+    return tavily_client.search(
+        query,
+        max_results=max_results,
+        include_raw_content=include_raw_content,
+        topic=topic,
+    )
 
 
 agent = create_deep_agent(
     model="openrouter:z-ai/glm-5.3-flash",
-    tools=[get_weather],
+    tools=[internet_search],
     system_prompt=orchestrator_prompt,
 )
 
