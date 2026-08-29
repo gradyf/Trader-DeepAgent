@@ -14,12 +14,8 @@ anthropic_api = os.getenv("ANTHROPIC_API_KEY")
 # Prompts
 
 client = Client()
-pulled_prompt = client.pull_prompt("orchestrator:b4f99065")
-orchestrator_prompt = "\n\n".join(
-    message.prompt.template
-    for message in pulled_prompt.messages
-    if message.__class__.__name__ == "SystemMessagePromptTemplate"
-)
+pulled_prompt = client.pull_prompt("orchestrator:883b2411")
+orchestrator_prompt = pulled_prompt.messages[0].prompt.template
 print(orchestrator_prompt)
 
 
@@ -44,9 +40,11 @@ agent = create_deep_agent(
     system_prompt=orchestrator_prompt,
 )
 
+stock = "META"
+
 
 result = agent.invoke(
-    {"messages": [{"role": "user", "content": "What is the weather in Denver today?"}]}
+    {"messages": [{"role": "user", "content": f"Please analyze the stock {stock}."}]}
 )
 
 # Print the agent's response
