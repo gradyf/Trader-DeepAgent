@@ -11,10 +11,12 @@ open_router_api = os.getenv("OPENROUTER_API_KEY")
 tavily_client = TavilyClient(api_key=os.environ["TAVILY_API_KEY"])
 anthropic_api = os.getenv("ANTHROPIC_API_KEY")
 
+
+
 # Prompts
 
 client = Client()
-pulled_prompt = client.pull_prompt("orchestrator:883b2411")
+pulled_prompt = client.pull_prompt("orchestrator:39d09065")
 orchestrator_prompt = pulled_prompt.messages[0].prompt.template
 print(orchestrator_prompt)
 
@@ -40,7 +42,7 @@ agent = create_deep_agent(
     system_prompt=orchestrator_prompt,
 )
 
-stock = "META"
+stock = "BOA"
 
 
 result = agent.invoke(
