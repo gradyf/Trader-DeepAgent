@@ -5,13 +5,18 @@ from typing import Literal
 from tavily import TavilyClient
 from deepagents import create_deep_agent
 from langsmith import Client
+from deepagents.backends import CompositeBackend, StateBackend, FilesystemBackend
 import datetime
+from langgraph.checkpoint.memory import InMemorySaver
+from langgraph.store.memory import InMemoryStore
 
 
 open_router_api = os.getenv("OPENROUTER_API_KEY")
 tavily_client = TavilyClient(api_key=os.environ["TAVILY_API_KEY"])
 anthropic_api = os.getenv("ANTHROPIC_API_KEY")
 
+checkpoint = InMemorySaver()
+store = InMemoryStore()
 
 
 # Prompts
@@ -43,19 +48,26 @@ def internet_search(
 agent = create_deep_agent(
     model="openrouter:z-ai/glm-5.3-flash",
     tools=[internet_search],
+    checkpointer=checkpoint,
+    backend=CompositeBackend(
+        default=StateBackend(),
+        routes={
+            "/research": FilesystemBackend(root_dir="./", virtual_mode=True),
+        },
+    ),
     system_prompt=orchestrator_prompt,
 )
 
-stock = "BOA"
+stock = "BAC"
 
 
-result = agent.invoke(
-    {"messages": [{"role": "user", "content": f"Please analyze the stock {stock}."}]}
-)
+# result = agent.invoke(
+#     {"messages": [{"role": "user", "content": f"Please analyze the stock {stock}."}]}
+# )
 
-# Print the agent's response
-content = result["messages"][-1].content
-if isinstance(content, list):
-    print("".join(block["text"] for block in content if block.get("type") == "text"))
-else:
-    print(content)
+# # Print the agent's response
+# content = result["messages"][-1].content
+# if isinstance(content, list):
+#     print("".join(block["text"] for block in content if block.get("type") == "text"))
+# else:
+#     print(content)
