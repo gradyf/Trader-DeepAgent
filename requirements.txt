@@ -4,3 +4,4 @@ langchain-openrouter
 langsmith
 tavily-python
 anthropic
+langgraph-checkpoint
