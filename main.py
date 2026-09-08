@@ -5,6 +5,7 @@ from typing import Literal
 from tavily import TavilyClient
 from deepagents import create_deep_agent
 from langsmith import Client
+import datetime
 
 
 open_router_api = os.getenv("OPENROUTER_API_KEY")
@@ -16,8 +17,11 @@ anthropic_api = os.getenv("ANTHROPIC_API_KEY")
 # Prompts
 
 client = Client()
-pulled_prompt = client.pull_prompt("orchestrator:39d09065")
-orchestrator_prompt = pulled_prompt.messages[0].prompt.template
+pulled_prompt = client.pull_prompt("orchestrator:production")
+prompt_pull = pulled_prompt.invoke({"date": datetime.date.today()})
+messages = prompt_pull.to_messages()
+first = messages[0]
+orchestrator_prompt = first.content
 print(orchestrator_prompt)
 
 
