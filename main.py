@@ -52,7 +52,7 @@ agent = create_deep_agent(
     backend=CompositeBackend(
         default=StateBackend(),
         routes={
-            "/research": FilesystemBackend(root_dir="./", virtual_mode=True),
+            "/research": FilesystemBackend(root_dir="./research", virtual_mode=True),
         },
     ),
     system_prompt=orchestrator_prompt,
